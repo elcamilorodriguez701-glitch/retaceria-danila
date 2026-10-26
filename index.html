@@ -36,6 +36,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+section, header[id] { scroll-margin-top: 72px; }
 body {
   background-color: var(--mat);
   background-image:
@@ -1128,10 +1129,13 @@ footer .wrap > span:first-child { display: inline-flex; align-items: center; }
   document.addEventListener('danila:close-jump', function () { setOpen(false); });
   menu.addEventListener('click', function (e) {
     var a = e.target.closest('a'); if (!a) return;
-    e.preventDefault();
     var target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     setOpen(false);
+    if (!target) return;
+    // Primero intenta desplazar la página; si el visor no lo permite, deja que el enlace #ancla haga el salto.
+    var before = target.getBoundingClientRect().top;
+    try { target.scrollIntoView({ block: 'start' }); } catch (err) {}
+    if (Math.abs(target.getBoundingClientRect().top - before) > 2 || Math.abs(before) < 80) e.preventDefault();
   });
   document.addEventListener('click', function (e) { if (!jump.contains(e.target)) setOpen(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
