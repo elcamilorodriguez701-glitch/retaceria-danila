@@ -1,3 +1,14 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Retacería Danila en Avellaneda, Santa Fe: retazos por kilo, telas en general, venta minorista y mayorista y envíos a todo el país.">
+<meta property="og:title" content="Retacería Danila">
+<meta property="og:description" content="Retazos por kilo y telas en general. Catálogo con precios, pedidos por WhatsApp y envíos a todo el país.">
+<style>html{color-scheme:dark;overflow-x:clip}body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
 <title>Retacería Danila</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1046,7 +1057,8 @@ footer .wrap { padding-block: 1.5rem 2.5rem; display: flex; justify-content: spa
   var btn = document.getElementById('jump-btn');
   var menu = document.getElementById('jump-menu');
   function setOpen(o) { jump.classList.toggle('open', o); menu.hidden = !o; btn.setAttribute('aria-expanded', o ? 'true' : 'false'); }
-  btn.addEventListener('click', function (e) { e.stopPropagation(); setOpen(menu.hidden); });
+  btn.addEventListener('click', function (e) { e.stopPropagation(); document.dispatchEvent(new Event('danila:close-cart')); setOpen(menu.hidden); });
+  document.addEventListener('danila:close-jump', function () { setOpen(false); });
   menu.addEventListener('click', function (e) {
     var a = e.target.closest('a'); if (!a) return;
     e.preventDefault();
@@ -1155,8 +1167,9 @@ footer .wrap { padding-block: 1.5rem 2.5rem; display: flex; justify-content: spa
     send.href = 'https://wa.me/5493482529222?text=' + encodeURIComponent(message());
     send.setAttribute('aria-disabled', count ? 'false' : 'true');
   }
-  function open() { panel.hidden = false; back.hidden = false; document.getElementById('cart-close').focus(); }
-  function close() { panel.hidden = true; back.hidden = true; bar.focus(); }
+  function open() { document.dispatchEvent(new Event('danila:close-jump')); panel.hidden = false; back.hidden = false; bar.setAttribute('aria-expanded', 'true'); document.getElementById('cart-close').focus(); }
+  function close() { panel.hidden = true; back.hidden = true; bar.setAttribute('aria-expanded', 'false'); }
+  document.addEventListener('danila:close-cart', function () { if (!panel.hidden) close(); });
 
   document.querySelectorAll('.items .item').forEach(function (item) {
     var base = item.querySelector('h3').textContent.trim();
@@ -1172,7 +1185,7 @@ footer .wrap { padding-block: 1.5rem 2.5rem; display: flex; justify-content: spa
       toast('Agregado: ' + name);
     });
   });
-  bar.addEventListener('click', open);
+  bar.addEventListener('click', function (e) { e.stopPropagation(); panel.hidden ? open() : close(); });
   back.addEventListener('click', close);
   document.getElementById('cart-close').addEventListener('click', close);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) close(); });
@@ -1197,3 +1210,6 @@ footer .wrap { padding-block: 1.5rem 2.5rem; display: flex; justify-content: spa
   });
 })();
 </script>
+
+</body>
+</html>
